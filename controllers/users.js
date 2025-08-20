@@ -6,6 +6,7 @@ const {
   NOT_FOUND,
   SERVER_ERROR,
   CONFLICT,
+  UNAUTHORIZED,
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -29,16 +30,6 @@ const createUser = (req, res) => {
         return res.status(BAD_REQUEST).send({ message: "Invalid user data" });
       }
       return res
-        .status(SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
-    });
-};
-
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.send({ data: users }))
-    .catch(() => {
-      res
         .status(SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
@@ -81,8 +72,15 @@ const login = (req, res) => {
       });
       res.send({ token });
     })
-    .catch(() => {
-      res.status(401).send({ message: "Incorrect email or password" });
+    .catch((err) => {
+      if (err.message && err.message.includes("Incorrect email or password")) {
+        return res
+          .status(UNAUTHORIZED)
+          .send({ message: "Incorrect email or password" });
+      }
+      return res
+        .status(SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -117,7 +115,6 @@ const updateCurrentUser = (req, res) => {
 
 module.exports = {
   createUser,
-  getUsers,
   getCurrentUser,
   login,
   updateCurrentUser,
