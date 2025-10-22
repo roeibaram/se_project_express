@@ -17,6 +17,16 @@ The back-end project is focused on creating a server for the WTWR application. Y
 
 `npm run dev` — to launch the server with the hot reload feature
 
-### Testing
+## Deployed URLs
 
-Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+Frontend: https://roeibwtwr.crabdance.com
+Backend API: https://api.roeibwtwr.crabdance.com
+
+## Frontend Repo
+
+https://github.com/roeibaram/se_project_react
+
+## Project Pitch Video
+
+Check out [RoeiBaram-ProjectPitch](https://drive.google.com/file/d/1R4BjXOEEJXMYieROQ8rlDnICtI70TjI4/view?usp=sharing), where I describe my
+project and some challenges I faced while building it.

@@ -1,42 +1,32 @@
 const ClothingItem = require("../models/clothingItem");
-const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  SERVER_ERROR,
-  FORBIDDEN,
-} = require("../utils/errors");
+const BadRequestError = require("../utils/errors/bad-request-err");
+const NotFoundError = require("../utils/errors/not-found-err");
+const ForbiddenError = require("../utils/errors/forbidden-err");
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.send({ data: items }))
-    .catch(() => {
-      res
-        .status(SERVER_ERROR)
-        .send({ message: "An error has occurred on the server." });
-    });
+    .catch(next);
 };
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => res.send({ data: item }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(BAD_REQUEST).send({ message: "Invalid item data" });
-      } else {
-        res
-          .status(SERVER_ERROR)
-          .send({ message: "An error has occurred on the server." });
+        return next(new BadRequestError("Invalid item data"));
       }
+      return next(err);
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   ClothingItem.findById(req.params.itemId)
-    .orFail(() => new Error("NotFound"))
+    .orFail(() => new NotFoundError("Requested resource not found"))
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
-        return res.status(FORBIDDEN).send({ message: "Forbidden" });
+        throw new ForbiddenError("Forbidden");
       }
       return ClothingItem.findByIdAndDelete(req.params.itemId).then(() =>
         res.send({ data: item })
@@ -44,56 +34,41 @@ const deleteItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
-      } else if (err.message === "NotFound") {
-        res.status(NOT_FOUND).send({ message: "Requested resource not found" });
-      } else {
-        res
-          .status(SERVER_ERROR)
-          .send({ message: "An error has occurred on the server." });
+        return next(new BadRequestError("Invalid item ID"));
       }
+      return next(err);
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => new Error("NotFound"))
+    .orFail(() => new NotFoundError("Item not found"))
     .then((item) => res.send({ data: item }))
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
-      } else if (err.message === "NotFound") {
-        res.status(NOT_FOUND).send({ message: "Item not found" });
-      } else {
-        res
-          .status(SERVER_ERROR)
-          .send({ message: "An error has occurred on the server" });
+        return next(new BadRequestError("Invalid item ID"));
       }
+      return next(err);
     });
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => new Error("NotFound"))
+    .orFail(() => new NotFoundError("Item not found"))
     .then((item) => res.send({ data: item }))
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
-      } else if (err.message === "NotFound") {
-        res.status(NOT_FOUND).send({ message: "Item not found" });
-      } else {
-        res
-          .status(SERVER_ERROR)
-          .send({ message: "An error has occurred on the server" });
+        return next(new BadRequestError("Invalid item ID"));
       }
+      return next(err);
     });
 };
 
