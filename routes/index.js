@@ -8,11 +8,12 @@ const clothingItemsRouter = require("./clothingItems");
 const {
   validateUserBody,
   validateLogin,
+  validateItemsQuery,
 } = require("../middlewares/validation");
 
 router.post("/signin", validateLogin, login);
 router.post("/signup", validateUserBody, createUser);
-router.get("/items", getItems);
+router.get("/items", validateItemsQuery, getItems);
 router.use(auth);
 router.use("/users", usersRouter);
 router.use("/items", clothingItemsRouter);

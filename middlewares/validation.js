@@ -5,6 +5,7 @@ const validateURL = (value) => {
   if (validator.isURL(value)) {
     return value;
   }
+
   throw new Error("Invalid URL");
 };
 
@@ -29,6 +30,15 @@ module.exports.validateLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
+  }),
+});
+
+module.exports.validateItemsQuery = celebrate({
+  query: Joi.object().keys({
+    weather: Joi.string().valid("hot", "warm", "cold"),
+    search: Joi.string().trim().min(1).max(30),
+    limit: Joi.number().integer().min(1).max(50),
+    skip: Joi.number().integer().min(0).max(500),
   }),
 });
 

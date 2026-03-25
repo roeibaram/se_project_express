@@ -9,17 +9,32 @@ The back-end project is focused on creating a server for the WTWR application. Y
 - MongoDB & Mongoose
 - JWT for authentication
 - bcrypt for password hashing
+- Celebrate/Joi for request validation
 - ESLint & Prettier for code quality
 
 ## Running the Project
 
 `npm run start` — to launch the server
 
-`npm run dev` — to launch the server with the hot reload feature
+`npm run dev` — to launch the server with hot reload
+
+## Useful Endpoints
+
+- `GET /health` — quick health check with API uptime
+- `GET /items` — public list of clothing items
+  - Optional query params:
+    - `weather=hot|warm|cold`
+    - `search=<text>` (matches item name)
+    - `limit=<1-50>`
+    - `skip=<0-500>`
+
+Example:
+
+`GET /items?weather=cold&search=jacket&limit=10&skip=0`
 
 ## Deployed URLs
 
-Frontend: https://roeibwtwr.crabdance.com
+Frontend: https://roeibwtwr.crabdance.com  
 Backend API: https://api.roeibwtwr.crabdance.com
 
 ## Frontend Repo
