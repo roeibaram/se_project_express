@@ -21,6 +21,7 @@ The back-end project is focused on creating a server for the WTWR application. Y
 ## Useful Endpoints
 
 - `GET /health` — quick health check with API uptime
+- `GET /items/stats` — summary counts grouped by weather and likes
 - `GET /items` — public list of clothing items
   - Optional query params:
     - `weather=hot|warm|cold`

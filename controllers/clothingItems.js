@@ -36,6 +36,55 @@ const getItems = (req, res, next) => {
     .catch(next);
 };
 
+const getItemsStats = (req, res, next) => {
+  ClothingItem.aggregate([
+    {
+      $project: {
+        weather: 1,
+        likesCount: { $size: "$likes" },
+      },
+    },
+    {
+      $group: {
+        _id: "$weather",
+        count: { $sum: 1 },
+        totalLikes: { $sum: "$likesCount" },
+      },
+    },
+    {
+      $sort: {
+        count: -1,
+      },
+    },
+  ])
+    .then((groupedStats) => {
+      const byWeather = groupedStats.map((group) => ({
+        weather: group._id,
+        count: group.count,
+        totalLikes: group.totalLikes,
+        averageLikes:
+          group.count > 0
+            ? Number((group.totalLikes / group.count).toFixed(2))
+            : 0,
+      }));
+
+      const totalItems = byWeather.reduce((sum, entry) => sum + entry.count, 0);
+      const totalLikes = byWeather.reduce(
+        (sum, entry) => sum + entry.totalLikes,
+        0
+      );
+
+      res.send({
+        data: {
+          totalItems,
+          totalLikes,
+          byWeather,
+        },
+      });
+    })
+    .catch(next);
+};
+
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
@@ -101,6 +150,7 @@ const dislikeItem = (req, res, next) => {
 
 module.exports = {
   getItems,
+  getItemsStats,
   createItem,
   deleteItem,
   likeItem,

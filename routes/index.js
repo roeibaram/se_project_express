@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 const auth = require("../middlewares/auth");
 const { login, createUser } = require("../controllers/users");
-const { getItems } = require("../controllers/clothingItems");
+const { getItems, getItemsStats } = require("../controllers/clothingItems");
 const usersRouter = require("./users");
 const clothingItemsRouter = require("./clothingItems");
 const {
@@ -13,6 +13,7 @@ const {
 
 router.post("/signin", validateLogin, login);
 router.post("/signup", validateUserBody, createUser);
+router.get("/items/stats", getItemsStats);
 router.get("/items", validateItemsQuery, getItems);
 router.use(auth);
 router.use("/users", usersRouter);
