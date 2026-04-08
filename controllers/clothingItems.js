@@ -3,8 +3,14 @@ const BadRequestError = require("../utils/errors/bad-request-err");
 const NotFoundError = require("../utils/errors/not-found-err");
 const ForbiddenError = require("../utils/errors/forbidden-err");
 
+const SORT_MAP = {
+  newest: { createdAt: -1 },
+  oldest: { createdAt: 1 },
+  name: { name: 1 },
+};
+
 const getItems = (req, res, next) => {
-  const { weather, search } = req.query;
+  const { weather, search, sort = "newest" } = req.query;
   const limit = Number(req.query.limit) || 20;
   const skip = Number(req.query.skip) || 0;
 
@@ -18,8 +24,13 @@ const getItems = (req, res, next) => {
     filter.name = { $regex: search, $options: "i" };
   }
 
+  const sortOption = SORT_MAP[sort] || SORT_MAP.newest;
+
   Promise.all([
-    ClothingItem.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    ClothingItem.find(filter)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit),
     ClothingItem.countDocuments(filter),
   ])
     .then(([items, total]) => {
@@ -30,6 +41,7 @@ const getItems = (req, res, next) => {
           returned: items.length,
           limit,
           skip,
+          sort,
         },
       });
     })
