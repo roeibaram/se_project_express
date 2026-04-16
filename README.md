@@ -34,6 +34,13 @@ Example:
 
 `GET /items?weather=cold&search=jacket&sort=name&limit=10&skip=0`
 
+`GET /items` response includes a `meta` object with:
+
+- `total` and `returned`
+- `page` and `totalPages`
+- `hasNextPage` and `hasPreviousPage`
+- `nextSkip` and `previousSkip`
+
 ## Deployed URLs
 
 Frontend: https://roeibwtwr.crabdance.com  

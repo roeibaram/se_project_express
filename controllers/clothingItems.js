@@ -9,6 +9,27 @@ const SORT_MAP = {
   name: { name: 1 },
 };
 
+const buildPaginationMeta = ({ total, returned, limit, skip, sort }) => {
+  const totalPages = total > 0 ? Math.ceil(total / limit) : 0;
+  const page = total > 0 ? Math.floor(skip / limit) + 1 : 0;
+  const hasPreviousPage = skip > 0;
+  const hasNextPage = skip + returned < total;
+
+  return {
+    total,
+    returned,
+    limit,
+    skip,
+    sort,
+    page,
+    totalPages,
+    hasNextPage,
+    hasPreviousPage,
+    nextSkip: hasNextPage ? skip + limit : null,
+    previousSkip: hasPreviousPage ? Math.max(0, skip - limit) : null,
+  };
+};
+
 const getItems = (req, res, next) => {
   const { weather, search, sort = "newest" } = req.query;
   const limit = Number(req.query.limit) || 20;
@@ -24,7 +45,8 @@ const getItems = (req, res, next) => {
     filter.name = { $regex: search, $options: "i" };
   }
 
-  const sortOption = SORT_MAP[sort] || SORT_MAP.newest;
+  const selectedSort = SORT_MAP[sort] ? sort : "newest";
+  const sortOption = SORT_MAP[selectedSort];
 
   Promise.all([
     ClothingItem.find(filter)
@@ -36,13 +58,13 @@ const getItems = (req, res, next) => {
     .then(([items, total]) => {
       res.send({
         data: items,
-        meta: {
+        meta: buildPaginationMeta({
           total,
           returned: items.length,
           limit,
           skip,
-          sort,
-        },
+          sort: selectedSort,
+        }),
       });
     })
     .catch(next);
