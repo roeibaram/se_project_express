@@ -26,13 +26,13 @@ The back-end project is focused on creating a server for the WTWR application. Y
   - Optional query params:
     - `weather=hot|warm|cold`
     - `search=<text>` (matches item name)
-    - `sort=newest|oldest|name`
+    - `sort=newest|oldest|name|likes`
     - `limit=<1-50>`
     - `skip=<0-500>`
 
 Example:
 
-`GET /items?weather=cold&search=jacket&sort=name&limit=10&skip=0`
+`GET /items?weather=cold&search=jacket&sort=likes&limit=10&skip=0`
 
 `GET /items` response includes a `meta` object with:
 

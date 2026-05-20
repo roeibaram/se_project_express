@@ -7,6 +7,7 @@ const SORT_MAP = {
   newest: { createdAt: -1 },
   oldest: { createdAt: 1 },
   name: { name: 1 },
+  likes: { likesCount: -1, createdAt: -1 },
 };
 
 const buildPaginationMeta = ({ total, returned, limit, skip, sort }) => {
@@ -48,13 +49,21 @@ const getItems = (req, res, next) => {
   const selectedSort = SORT_MAP[sort] ? sort : "newest";
   const sortOption = SORT_MAP[selectedSort];
 
-  Promise.all([
-    ClothingItem.find(filter)
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limit),
-    ClothingItem.countDocuments(filter),
-  ])
+  const itemsPromise = selectedSort === "likes"
+    ? ClothingItem.aggregate([
+        { $match: filter },
+        { $addFields: { likesCount: { $size: "$likes" } } },
+        { $sort: sortOption },
+        { $skip: skip },
+        { $limit: limit },
+        { $project: { likesCount: 0 } },
+      ]).then((items) => items.map((item) => ({ ...item, id: String(item._id) })))
+    : ClothingItem.find(filter)
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit);
+
+  Promise.all([itemsPromise, ClothingItem.countDocuments(filter)])
     .then(([items, total]) => {
       res.send({
         data: items,
