@@ -43,6 +43,13 @@ module.exports.validateItemsQuery = celebrate({
   }),
 });
 
+
+module.exports.validatePopularItemsQuery = celebrate({
+  query: Joi.object().keys({
+    limit: Joi.number().integer().min(1).max(20),
+  }),
+});
+
 module.exports.validateId = celebrate({
   params: Joi.object().keys({
     userId: Joi.string().hex().length(24),

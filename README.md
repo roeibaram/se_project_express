@@ -22,6 +22,8 @@ The back-end project is focused on creating a server for the WTWR application. Y
 
 - `GET /health` — quick health check with API uptime
 - `GET /items/stats` — summary counts grouped by weather and likes
+- `GET /items/popular` — most-liked clothing items, sorted by likes
+  - Optional query param: `limit=<1-20>`
 - `GET /items` — public list of clothing items
   - Optional query params:
     - `weather=hot|warm|cold`
@@ -33,6 +35,8 @@ The back-end project is focused on creating a server for the WTWR application. Y
 Example:
 
 `GET /items?weather=cold&search=jacket&sort=likes&limit=10&skip=0`
+
+`GET /items/popular?limit=5`
 
 `GET /items` response includes a `meta` object with:
 

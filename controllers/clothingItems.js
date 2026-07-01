@@ -128,6 +128,32 @@ const getItemsStats = (req, res, next) => {
     .catch(next);
 };
 
+
+const getPopularItems = (req, res, next) => {
+  const limit = Number(req.query.limit) || 5;
+
+  Promise.all([
+    ClothingItem.aggregate([
+      { $addFields: { likesCount: { $size: "$likes" } } },
+      { $sort: { likesCount: -1, createdAt: -1 } },
+      { $limit: limit },
+    ]),
+    ClothingItem.countDocuments(),
+  ])
+    .then(([items, total]) => {
+      res.send({
+        data: items.map((item) => ({ ...item, id: String(item._id) })),
+        meta: {
+          total,
+          returned: items.length,
+          limit,
+          sort: "likes",
+        },
+      });
+    })
+    .catch(next);
+};
+
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
@@ -194,6 +220,7 @@ const dislikeItem = (req, res, next) => {
 module.exports = {
   getItems,
   getItemsStats,
+  getPopularItems,
   createItem,
   deleteItem,
   likeItem,
