@@ -79,6 +79,20 @@ const getItems = (req, res, next) => {
     .catch(next);
 };
 
+
+const getItemById = (req, res, next) => {
+  ClothingItem.findById(req.params.itemId)
+    .orFail(() => new NotFoundError("Item not found"))
+    .then((item) => res.send({ data: item }))
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid item ID"));
+      }
+
+      return next(err);
+    });
+};
+
 const getItemsStats = (req, res, next) => {
   ClothingItem.aggregate([
     {
@@ -127,7 +141,6 @@ const getItemsStats = (req, res, next) => {
     })
     .catch(next);
 };
-
 
 const getPopularItems = (req, res, next) => {
   const limit = Number(req.query.limit) || 5;
@@ -219,6 +232,7 @@ const dislikeItem = (req, res, next) => {
 
 module.exports = {
   getItems,
+  getItemById,
   getItemsStats,
   getPopularItems,
   createItem,

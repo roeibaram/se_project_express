@@ -24,6 +24,7 @@ The back-end project is focused on creating a server for the WTWR application. Y
 - `GET /items/stats` — summary counts grouped by weather and likes
 - `GET /items/popular` — most-liked clothing items, sorted by likes
   - Optional query param: `limit=<1-20>`
+- `GET /items/:itemId` — public details for one clothing item
 - `GET /items` — public list of clothing items
   - Optional query params:
     - `weather=hot|warm|cold`
@@ -37,6 +38,8 @@ Example:
 `GET /items?weather=cold&search=jacket&sort=likes&limit=10&skip=0`
 
 `GET /items/popular?limit=5`
+
+`GET /items/64f1b8f3c2a4a9d3f7b12345`
 
 `GET /items` response includes a `meta` object with:
 
