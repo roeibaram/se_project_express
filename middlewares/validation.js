@@ -46,6 +46,7 @@ module.exports.validateItemsQuery = celebrate({
 
 module.exports.validatePopularItemsQuery = celebrate({
   query: Joi.object().keys({
+    weather: Joi.string().valid("hot", "warm", "cold"),
     limit: Joi.number().integer().min(1).max(20),
   }),
 });

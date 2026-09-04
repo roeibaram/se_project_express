@@ -143,15 +143,18 @@ const getItemsStats = (req, res, next) => {
 };
 
 const getPopularItems = (req, res, next) => {
+  const { weather } = req.query;
   const limit = Number(req.query.limit) || 5;
+  const filter = weather ? { weather } : {};
 
   Promise.all([
     ClothingItem.aggregate([
+      { $match: filter },
       { $addFields: { likesCount: { $size: "$likes" } } },
       { $sort: { likesCount: -1, createdAt: -1 } },
       { $limit: limit },
     ]),
-    ClothingItem.countDocuments(),
+    ClothingItem.countDocuments(filter),
   ])
     .then(([items, total]) => {
       res.send({
@@ -161,6 +164,7 @@ const getPopularItems = (req, res, next) => {
           returned: items.length,
           limit,
           sort: "likes",
+          weather: weather || "all",
         },
       });
     })
