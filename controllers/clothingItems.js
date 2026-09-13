@@ -32,7 +32,7 @@ const buildPaginationMeta = ({ total, returned, limit, skip, sort }) => {
 };
 
 const getItems = (req, res, next) => {
-  const { weather, search, sort = "newest" } = req.query;
+  const { weather, search, owner, sort = "newest" } = req.query;
   const limit = Number(req.query.limit) || 20;
   const skip = Number(req.query.skip) || 0;
 
@@ -40,6 +40,10 @@ const getItems = (req, res, next) => {
 
   if (weather) {
     filter.weather = weather;
+  }
+
+  if (owner) {
+    filter.owner = owner;
   }
 
   if (search) {
@@ -143,9 +147,17 @@ const getItemsStats = (req, res, next) => {
 };
 
 const getPopularItems = (req, res, next) => {
-  const { weather } = req.query;
+  const { weather, owner } = req.query;
   const limit = Number(req.query.limit) || 5;
-  const filter = weather ? { weather } : {};
+  const filter = {};
+
+  if (weather) {
+    filter.weather = weather;
+  }
+
+  if (owner) {
+    filter.owner = owner;
+  }
 
   Promise.all([
     ClothingItem.aggregate([
@@ -165,6 +177,7 @@ const getPopularItems = (req, res, next) => {
           limit,
           sort: "likes",
           weather: weather || "all",
+          owner: owner || "all",
         },
       });
     })

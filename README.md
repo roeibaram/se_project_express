@@ -25,11 +25,13 @@ The back-end project is focused on creating a server for the WTWR application. Y
 - `GET /items/popular` — most-liked clothing items, sorted by likes
   - Optional query params:
     - `weather=hot|warm|cold`
+    - `owner=<userId>`
     - `limit=<1-20>`
 - `GET /items/:itemId` — public details for one clothing item
 - `GET /items` — public list of clothing items
   - Optional query params:
     - `weather=hot|warm|cold`
+    - `owner=<userId>`
     - `search=<text>` (matches item name)
     - `sort=newest|oldest|name|likes`
     - `limit=<1-50>`
@@ -37,11 +39,11 @@ The back-end project is focused on creating a server for the WTWR application. Y
 
 Example:
 
-`GET /items?weather=cold&search=jacket&sort=likes&limit=10&skip=0`
+`GET /items?weather=cold&owner=64f1b8f3c2a4a9d3f7b12345&search=jacket&sort=likes&limit=10&skip=0`
 
 `GET /items/popular?limit=5`
 
-`GET /items/popular?weather=cold&limit=5`
+`GET /items/popular?weather=cold&owner=64f1b8f3c2a4a9d3f7b12345&limit=5`
 
 `GET /items/64f1b8f3c2a4a9d3f7b12345`
 
