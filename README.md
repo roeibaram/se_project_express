@@ -14,13 +14,25 @@ The back-end project is focused on creating a server for the WTWR application. Y
 
 ## Running the Project
 
+Install dependencies:
+
+`npm install`
+
 `npm run start` — to launch the server
 
 `npm run dev` — to launch the server with hot reload
 
+By default, the API connects to a local MongoDB database named `wtwr_db`.
+Make sure MongoDB is running before starting the server.
+
 ## Useful Endpoints
 
 - `GET /health` — quick health check with API uptime
+- `POST /signup` — create a new user account
+- `POST /signin` — sign in and receive a JWT
+- `GET /users/me` — get the current signed-in user
+- `PATCH /users/me` — update profile information
+- `PATCH /users/me/avatar` — update the user avatar
 - `GET /items/stats` — summary counts grouped by weather and likes
 - `GET /items/popular` — most-liked clothing items, sorted by likes
   - Optional query params:
@@ -53,6 +65,11 @@ Example:
 - `page` and `totalPages`
 - `hasNextPage` and `hasPreviousPage`
 - `nextSkip` and `previousSkip`
+
+## Error Handling
+
+The API uses custom error classes and a centralized error handler so route controllers can pass errors to `next()`.
+Request and error logs are handled with Winston middleware, which keeps debugging information separate from the main route logic.
 
 ## Deployed URLs
 
