@@ -10,6 +10,25 @@ const SORT_MAP = {
   likes: { likesCount: -1, createdAt: -1 },
 };
 
+const buildItemFilter = ({ weather, owner, search }) => {
+  const filter = {};
+
+  if (weather) {
+    filter.weather = weather;
+  }
+
+  if (owner) {
+    filter.owner = owner;
+  }
+
+  if (search) {
+    const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    filter.name = { $regex: escapedSearch, $options: "i" };
+  }
+
+  return filter;
+};
+
 const buildPaginationMeta = ({ total, returned, limit, skip, sort }) => {
   const totalPages = total > 0 ? Math.ceil(total / limit) : 0;
   const page = total > 0 ? Math.floor(skip / limit) + 1 : 0;
@@ -36,19 +55,7 @@ const getItems = (req, res, next) => {
   const limit = Number(req.query.limit) || 20;
   const skip = Number(req.query.skip) || 0;
 
-  const filter = {};
-
-  if (weather) {
-    filter.weather = weather;
-  }
-
-  if (owner) {
-    filter.owner = owner;
-  }
-
-  if (search) {
-    filter.name = { $regex: search, $options: "i" };
-  }
+  const filter = buildItemFilter({ weather, owner, search });
 
   const selectedSort = SORT_MAP[sort] ? sort : "newest";
   const sortOption = SORT_MAP[selectedSort];
@@ -149,15 +156,7 @@ const getItemsStats = (req, res, next) => {
 const getPopularItems = (req, res, next) => {
   const { weather, owner } = req.query;
   const limit = Number(req.query.limit) || 5;
-  const filter = {};
-
-  if (weather) {
-    filter.weather = weather;
-  }
-
-  if (owner) {
-    filter.owner = owner;
-  }
+  const filter = buildItemFilter({ weather, owner });
 
   Promise.all([
     ClothingItem.aggregate([
